@@ -3,9 +3,9 @@
 A collection of CLI tools for the Discord power user
 
 ## Features:
+- guild count
 
 ## TODO:
-- [ ] guild count
 - [ ] list all user and guild experiments
 - [ ] list servers in experiments
 - [ ] get bearer token for scope via client credentials
