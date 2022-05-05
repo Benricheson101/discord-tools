@@ -6,12 +6,16 @@ use serde::{Deserialize, Serialize};
 const OAUTH_TOKEN_URL: &str = "https://discord.com/api/v10/oauth2/token";
 const USER_GUILDS_URL: &str = "https://discord.com/api/v10/users/@me/guilds";
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct ClientCredentials {
     pub access_token: String,
     pub token_type: String,
     pub expires_in: u32,
-    #[serde(rename = "scope", deserialize_with = "crate::de_vec_scope")]
+    #[serde(
+        rename = "scope",
+        deserialize_with = "crate::de_vec_scope",
+        serialize_with = "crate::se_vec_scope"
+    )]
     pub scopes: Vec<crate::Scope>,
 }
 

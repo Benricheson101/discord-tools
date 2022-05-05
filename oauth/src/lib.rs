@@ -1,7 +1,7 @@
 pub mod client_credentials;
 pub mod error;
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize, Serializer};
 use strum::{Display, EnumIter, EnumMessage, EnumString};
 
 #[derive(Debug, Deserialize, Serialize, Display, EnumIter, EnumMessage, EnumString)]
@@ -83,7 +83,7 @@ pub enum Scope {
     WebhookIncoming,
 }
 
-fn de_vec_scope<'de, D>(deserializer: D) -> Result<Vec<Scope>, D::Error>
+pub(crate) fn de_vec_scope<'de, D>(deserializer: D) -> Result<Vec<Scope>, D::Error>
 where
     D: serde::Deserializer<'de>,
 {
@@ -93,4 +93,17 @@ where
         .filter_map(|s| Scope::try_from(s).ok())
         .collect::<Vec<Scope>>();
     Ok(scopes)
+}
+
+pub(crate) fn se_vec_scope<S>(scopes: &Vec<Scope>, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    let scope_string = scopes
+        .iter()
+        .map(|s| s.to_string())
+        .collect::<Vec<String>>()
+        .join(" ");
+
+    serializer.serialize_str(&scope_string)
 }

@@ -98,7 +98,9 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
             let client_credentials =
                 ClientCredentials::request(&oauth.client_id, &oauth.client_secret, scopes).await?;
 
-            println!("{:#?}", client_credentials);
+            let json = serde_json::to_string(&client_credentials)?;
+
+            print!("{}", json);
         }
     }
 
