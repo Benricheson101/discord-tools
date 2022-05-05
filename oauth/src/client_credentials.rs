@@ -1,3 +1,5 @@
+use std::process;
+
 use reqwest::{Client, Method, Url};
 use serde::{Deserialize, Serialize};
 
@@ -17,12 +19,18 @@ impl ClientCredentials {
     pub async fn request(
         client_id: &str,
         client_secret: &str,
-        scope: &str,
+        scopes: &Vec<crate::Scope>,
     ) -> Result<Self, reqwest::Error> {
         let url = Url::parse(OAUTH_TOKEN_URL).unwrap();
 
+        let scope = scopes
+            .iter()
+            .map(|s| s.to_string())
+            .collect::<Vec<String>>()
+            .join(" ");
+
         let body = ClientCredentialsRequest {
-            scope,
+            scope: &scope,
             client_id,
             client_secret,
             grant_type: "client_credentials",
@@ -39,7 +47,15 @@ impl ClientCredentials {
             )
             .body(data);
 
-        req.send().await?.json::<Self>().await
+        let resp = req.send().await?;
+        if resp.status().is_success() {
+            return resp.json::<Self>().await;
+        } else {
+            // TODO: return Error type
+            let bdy = resp.text().await?;
+            eprintln!("{}", bdy);
+            process::exit(1);
+        }
     }
 
     pub async fn get_user_guilds(&self) -> Result<Vec<Guild>, reqwest::Error> {
