@@ -97,7 +97,7 @@ where
     Ok(scopes)
 }
 
-pub(crate) fn se_vec_scope<S>(scopes: &Vec<Scope>, serializer: S) -> Result<S::Ok, S::Error>
+pub(crate) fn se_vec_scope<S>(scopes: &[Scope], serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {

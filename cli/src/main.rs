@@ -1,4 +1,4 @@
-use std::{error, io, str::FromStr};
+use std::{error, io};
 
 use clap::{Args, Command, CommandFactory, Parser, PossibleValue, Subcommand, ValueHint};
 use clap_complete::{generate, Generator, Shell};
@@ -30,7 +30,7 @@ enum Commands {
             multiple_occurrences = true,
             possible_values = scope_to_possible_value()
         )]
-        scopes: Vec<oauth::Scope>,
+        scopes: Vec<Scope>,
     },
 
     #[clap(about = "Output shell completion functions")]
@@ -79,10 +79,10 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
 
     match &args.command {
         Commands::GuildCount { oauth } => {
-            let scope = Scope::from_str("guilds").unwrap();
+            let scope = Scope::Guilds;
 
             let client_credentials =
-                ClientCredentials::request(&oauth.client_id, &oauth.client_secret, &vec![scope])
+                ClientCredentials::request(&oauth.client_id, &oauth.client_secret, &[scope])
                     .await?;
 
             let guilds = client_credentials.get_user_guilds().await?;
@@ -113,7 +113,7 @@ fn print_completions<G: Generator>(gen: G, cmd: &mut Command) {
 }
 
 fn scope_to_possible_value() -> Vec<PossibleValue<'static>> {
-    oauth::Scope::iter()
+    Scope::iter()
         .map(|s| {
             // FIXME: this is BAD is there a better way without leaking memory
             let mut pv = PossibleValue::new(Box::leak(s.to_string().into_boxed_str()));
@@ -124,5 +124,5 @@ fn scope_to_possible_value() -> Vec<PossibleValue<'static>> {
 
             pv
         })
-        .collect::<Vec<_>>()
+        .collect()
 }

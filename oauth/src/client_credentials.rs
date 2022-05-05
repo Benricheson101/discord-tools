@@ -3,6 +3,8 @@ use std::process;
 use reqwest::{Client, Method, Url};
 use serde::{Deserialize, Serialize};
 
+use crate::{de_vec_scope, se_vec_scope, Scope};
+
 const OAUTH_TOKEN_URL: &str = "https://discord.com/api/v10/oauth2/token";
 const USER_GUILDS_URL: &str = "https://discord.com/api/v10/users/@me/guilds";
 
@@ -13,17 +15,17 @@ pub struct ClientCredentials {
     pub expires_in: u32,
     #[serde(
         rename = "scope",
-        deserialize_with = "crate::de_vec_scope",
-        serialize_with = "crate::se_vec_scope"
+        deserialize_with = "de_vec_scope",
+        serialize_with = "se_vec_scope"
     )]
-    pub scopes: Vec<crate::Scope>,
+    pub scopes: Vec<Scope>,
 }
 
 impl ClientCredentials {
     pub async fn request(
         client_id: &str,
         client_secret: &str,
-        scopes: &Vec<crate::Scope>,
+        scopes: &[Scope],
     ) -> Result<Self, reqwest::Error> {
         let url = Url::parse(OAUTH_TOKEN_URL).unwrap();
 
