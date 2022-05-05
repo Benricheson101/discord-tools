@@ -19,17 +19,6 @@ struct Cli {
 
 #[derive(Debug, Subcommand)]
 enum Commands {
-    #[clap(about = "Output shell completion functions")]
-    Completions {
-        #[clap(arg_enum)]
-        shell: Shell,
-    },
-
-    #[clap(about = "Count the number of guilds you're in.")]
-    GuildCount {
-        #[clap(flatten)]
-        oauth: OAuthArgs,
-    },
     #[clap(about = "Get a bearer token for selected OAuth scopes")]
     ClientCredentials {
         #[clap(flatten)]
@@ -42,6 +31,18 @@ enum Commands {
             possible_values = scope_to_possible_value()
         )]
         scopes: Vec<oauth::Scope>,
+    },
+
+    #[clap(about = "Output shell completion functions")]
+    Completions {
+        #[clap(arg_enum)]
+        shell: Shell,
+    },
+
+    #[clap(about = "Count the number of guilds you're in.")]
+    GuildCount {
+        #[clap(flatten)]
+        oauth: OAuthArgs,
     },
 }
 
@@ -114,7 +115,7 @@ fn print_completions<G: Generator>(gen: G, cmd: &mut Command) {
 fn scope_to_possible_value() -> Vec<PossibleValue<'static>> {
     oauth::Scope::iter()
         .map(|s| {
-            // FIXME: this is BAD is there a better way than Box::leak
+            // FIXME: this is BAD is there a better way without leaking memory
             let mut pv = PossibleValue::new(Box::leak(s.to_string().into_boxed_str()));
 
             if let Some(doc) = s.get_documentation() {

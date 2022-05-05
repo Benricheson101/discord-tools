@@ -4,6 +4,8 @@ pub mod error;
 use serde::{Deserialize, Serialize, Serializer};
 use strum::{Display, EnumIter, EnumMessage, EnumString};
 
+// TODO: separate enum for whitelisted scopes
+
 #[derive(Debug, Deserialize, Serialize, Display, EnumIter, EnumMessage, EnumString)]
 pub enum Scope {
     /// allows your app to fetch data from a user's 'Now Playing/Recently Played' list - requires Discord approval
