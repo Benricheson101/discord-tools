@@ -5,6 +5,7 @@ A collection of CLI tools for the Discord power user
 ## Features:
 - guild count
 - get bearer token for scope via client credentials
+- permission calculator
 
 ## TODO:
 - [ ] list all user and guild experiments
@@ -12,6 +13,5 @@ A collection of CLI tools for the Discord power user
 - [ ] user lookup using bot token
 - [ ] current versions
 - [ ] status page status
-- [ ] permission calculator
 - [ ] intent calculator
 - [ ] slash command create/delete/list
