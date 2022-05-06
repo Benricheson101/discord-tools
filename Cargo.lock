@@ -109,11 +109,20 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "clap_complete",
+ "common",
  "oauth",
  "serde_json",
  "strum",
  "thiserror",
  "tokio",
+]
+
+[[package]]
+name = "common"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "strum",
 ]
 
 [[package]]

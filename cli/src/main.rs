@@ -3,8 +3,28 @@ use std::{error, io};
 use clap::{Args, Command, CommandFactory, Parser, PossibleValue, Subcommand, ValueHint};
 use clap_complete::{generate, Generator, Shell};
 
+use common::models::perms::{Permission, Permissions};
 use oauth::{client_credentials::ClientCredentials, Scope};
 use strum::{EnumMessage, IntoEnumIterator};
+
+macro_rules! pv {
+    ($type:ty) => {{
+        <$type>::iter()
+            .map(|s| {
+                // FIXME: this is BAD is there a better way without leaking memory
+                let name = Box::leak(s.to_string().into_boxed_str());
+
+                let mut pv = PossibleValue::new(name);
+
+                if let Some(doc) = s.get_documentation() {
+                    pv = pv.help(doc);
+                }
+
+                pv
+            })
+            .collect::<Vec<PossibleValue<'static>>>()
+    }};
+}
 
 #[derive(Debug, Parser)]
 #[clap(
@@ -28,7 +48,7 @@ enum Commands {
             long = "scope",
             required = true,
             multiple_occurrences = true,
-            possible_values = scope_to_possible_value()
+            possible_values = pv!(Scope),
         )]
         scopes: Vec<Scope>,
     },
@@ -43,6 +63,12 @@ enum Commands {
     GuildCount {
         #[clap(flatten)]
         oauth: OAuthArgs,
+    },
+
+    #[clap(about = "Calculate bitwise permissions", aliases = &["permission-calculator", "perm-calc"])]
+    Perms {
+        #[clap(flatten)]
+        perms: PermissionArgs,
     },
 }
 
@@ -65,6 +91,15 @@ struct OAuthArgs {
         value_hint = ValueHint::Unknown
     )]
     client_id: String,
+}
+
+#[derive(Debug, Args)]
+struct PermissionArgs {
+    #[clap(
+        help = "Discord permission name",
+        possible_values = pv!(Permission),
+    )]
+    permissions: Vec<Permission>,
 }
 
 #[derive(Debug, Args)]
@@ -103,6 +138,11 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
 
             print!("{}", json);
         }
+
+        Commands::Perms { perms } => {
+            let p = Permissions::from(&perms.permissions);
+            print!("{}", p.0);
+        }
     }
 
     Ok(())
@@ -110,19 +150,4 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
 
 fn print_completions<G: Generator>(gen: G, cmd: &mut Command) {
     generate(gen, cmd, cmd.get_name().to_string(), &mut io::stdout());
-}
-
-fn scope_to_possible_value() -> Vec<PossibleValue<'static>> {
-    Scope::iter()
-        .map(|s| {
-            // FIXME: this is BAD is there a better way without leaking memory
-            let mut pv = PossibleValue::new(Box::leak(s.to_string().into_boxed_str()));
-
-            if let Some(doc) = s.get_documentation() {
-                pv = pv.help(doc);
-            }
-
-            pv
-        })
-        .collect()
 }
