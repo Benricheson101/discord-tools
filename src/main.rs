@@ -1,10 +1,16 @@
+pub mod models;
+pub mod oauth;
+
 use std::{error, io};
 
 use clap::{Args, Command, CommandFactory, Parser, PossibleValue, Subcommand, ValueHint};
 use clap_complete::{generate, Generator, Shell};
 
-use common::models::perms::{Permission, Permissions};
-use oauth::{client_credentials::ClientCredentials, Scope};
+use models::{
+    perms::{Permission, Permissions},
+    scope::Scope,
+};
+use oauth::client_credentials::ClientCredentials;
 use strum::{EnumMessage, IntoEnumIterator};
 
 macro_rules! pv {

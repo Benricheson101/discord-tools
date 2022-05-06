@@ -3,7 +3,7 @@ use std::process;
 use reqwest::{Client, Method, Url};
 use serde::{Deserialize, Serialize};
 
-use crate::{de_vec_scope, se_vec_scope, Scope};
+use crate::models::scope::{de_vec_scope, se_vec_scope, Scope};
 
 const OAUTH_TOKEN_URL: &str = "https://discord.com/api/v10/oauth2/token";
 const USER_GUILDS_URL: &str = "https://discord.com/api/v10/users/@me/guilds";
