@@ -1,3 +1,4 @@
+pub mod config;
 pub mod models;
 pub mod oauth;
 
@@ -6,6 +7,7 @@ use std::{error, io};
 use clap::{Args, Command, CommandFactory, Parser, PossibleValue, Subcommand, ValueHint};
 use clap_complete::{generate, Generator, Shell};
 
+use config::Config;
 use models::{
     perms::{Permission, Permissions},
     scope::Scope,
@@ -19,7 +21,6 @@ macro_rules! pv {
             .map(|s| {
                 // FIXME: this is BAD is there a better way without leaking memory
                 let name = Box::leak(s.to_string().into_boxed_str());
-
                 let mut pv = PossibleValue::new(name);
 
                 if let Some(doc) = s.get_documentation() {
@@ -52,6 +53,7 @@ enum Commands {
         #[clap(
             name = "SCOPE",
             long = "scope",
+            help = "the scopes to use",
             required = true,
             multiple_occurrences = true,
             possible_values = pv!(Scope),
@@ -116,8 +118,9 @@ struct BotAuthArgs {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn error::Error>> {
-    let args = Cli::parse();
+    Config::load_config();
 
+    let args = Cli::parse();
     match &args.command {
         Commands::GuildCount { oauth } => {
             let scope = Scope::Guilds;
