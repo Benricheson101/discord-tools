@@ -12,8 +12,8 @@ CLI flags > environment variables > config file
 
 ## Config Format:
 ### Location:
-**Linux**: `/home/$USER/.config/discordtools/config.toml`
-**MacOS**: `/Users/$USER/Library/Application Support/discordtools/config.toml`
+**Linux**: `/home/$USER/.config/discordtools/config.toml` \
+**MacOS**: `/Users/$USER/Library/Application Support/discordtools/config.toml` \
 **Windows**: `C:\Users\$USER\AppData\Roaming\discordtools\config.toml`
 
 ```toml
